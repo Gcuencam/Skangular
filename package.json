@@ -1,0 +1,19 @@
+{
+  "name": "Skangular",
+  "version": "1.0.0",
+  "description": "Angular app generator.",
+  "main": "skangular.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "blank"
+  },
+  "author": "Gabriel Cuenca Moncin",
+  "license": "MIT",
+  "devDependencies": {
+    "colors": "1.1.2",
+    "replacestream": "4.0.0"
+  }
+}
