@@ -3,6 +3,10 @@ var readline = require('readline');
 var colors = require('colors');
 var replaceStream = require('replacestream');
 
+var directorySrcCustom, publicDirectoryCustom;
+var directoryTemplate = "./templates/";
+var directorySrc, publicDirectory;
+
 colors.setTheme({
     info: 'green',
     data: 'grey',
@@ -19,94 +23,83 @@ var rl = readline.createInterface({
 
 rl.question("Angular app name: ".warn, function(answer) {
     var angularAppName = answer;
-    generateAppFile(angularAppName);
-    generateIndexFile(angularAppName);
-    setScss(angularAppName);
+    configDirectories(angularAppName);
 });
 
-var setScss = function(angularAppName){
-    rl.question("Use .scss files? (true or false): ".warn, function(answer) {
-        var scss = answer;
-        if((scss === "true") || (scss === "false")){
-            rl.close();
-            generateBasicFolder(scss, angularAppName);
-        }else{
-            console.log("Invalid answer".error);
-            setScss();
-        }
+var configDirectories = function(angularAppName){
+    rl.question("Introduza un directorio para los js, partiendo de raiz: ".warn, function(answer) {
+        directorySrcCustom = answer;
     });
+    rl.question("Introduza un directorio para el index, partiendo de raiz: ".warn, function(answer) {
+        publicDirectoryCustom = answer;
+    });
+
+    directorySrc = "../../" + directorySrcCustom;
+    publicDirectory = "../../" + publicDirectoryCustom;
+
+    generateAppFile(angularAppName);
+    generateIndexFile(angularAppName);
 };
+
 
 var generateAppFile = function(angularAppName){
     angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream("./templates/app")
+    fs.createReadStream(directoryTemplate + "app")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./" + angularAppName + "App.js"));
+        .pipe(fs.createWriteStream(directorySrc + "app" + angularAppName + ".js"));
 };
 
 var generateIndexFile = function(angularAppName){
     angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream("./templates/index")
+    fs.createReadStream(directoryTemplate + "index")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./index.html"));
+        .pipe(fs.createWriteStream(publicDirectory + "index.html"));
+
+    generateBasicFolder(angularAppName)
 };
 
 var generateBasicFile = function (angularAppName){
     angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream("./templates/controller")
+    fs.createReadStream(directoryTemplate + "controller")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./js/controllers/" + angularAppName + "Controller.js"));
-    fs.createReadStream("./templates/service")
+        .pipe(fs.createWriteStream(directorySrc + "controllers/" + angularAppName + "Controller.js"));
+    fs.createReadStream(directoryTemplate + "service")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./js/services/" + angularAppName + "Service.js"));
-    fs.createReadStream("./templates/factory")
+        .pipe(fs.createWriteStream(directorySrc + "services/" + angularAppName + "Service.js"));
+    fs.createReadStream(directoryTemplate + "factory")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./js/factories/" + angularAppName + "Factory.js"));
-    fs.createReadStream("./templates/config")
+        .pipe(fs.createWriteStream(directorySrc + "factories/" + angularAppName + "Factory.js"));
+    fs.createReadStream(directoryTemplate + "config")
         .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream("./" + angularAppName + "Config.js"));
+        .pipe(fs.createWriteStream(directorySrc + angularAppName + "Config.js"));
 
     endCreate();
 };
 
-var generateBasicFolder = function(scss, angularAppName){
+var generateBasicFolder = function(angularAppName){
 
-    var stylesFolderName;
 
-    if(scss === "true")
-        stylesFolderName = "scss";
-    else
-        stylesFolderName = "css";
-
-    fs.mkdir('./js',function(err){
+    fs.mkdir(directorySrc + 'controllers',function(err){
         if (err)
             return console.error(err.error);
     });
-    fs.mkdir('./js/controllers',function(err){
+    fs.mkdir(directorySrc + 'services',function(err){
         if (err)
             return console.error(err.error);
     });
-    fs.mkdir('./js/services',function(err){
+    fs.mkdir(directorySrc + 'factories',function(err){
         if (err)
             return console.error(err.error);
     });
-    fs.mkdir('./js/factories',function(err){
+    fs.mkdir(directorySrc + 'providers',function(err){
         if (err)
             return console.error(err.error);
     });
-    fs.mkdir('./js/providers',function(err){
+    fs.mkdir(directorySrc + 'public_views',function(err){
         if (err)
             return console.error(err.error);
     });
-    fs.mkdir('./public_views',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir('./public_views/directives_templates',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir('./' + stylesFolderName,function(err){
+    fs.mkdir(directorySrc + 'public_views/directives_templates',function(err){
         if (err)
             return console.error(err.error);
     });
