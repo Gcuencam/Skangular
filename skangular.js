@@ -53,7 +53,7 @@ var skangular = {
         var angularAppName = skangular.lowerFirstLetter(skangular.angularAppName);
         fs.createReadStream(skangular.templateDirectory + "app")
             .pipe(replaceStream('*****', angularAppName))
-            .pipe(fs.createWriteStream(skangular.srcDirectory + "app" + angularAppName + ".js"));
+            .pipe(fs.createWriteStream(skangular.srcDirectory + "app" + skangular.angularAppName + ".js"));
     },
 
     generateIndexFile: function(){
@@ -107,7 +107,7 @@ var skangular = {
             .pipe(fs.createWriteStream(skangular.srcDirectory + "factories/" + angularAppName + "Factory.js"));
         fs.createReadStream(skangular.templateDirectory + "config")
             .pipe(replaceStream('*****', angularAppName))
-            .pipe(fs.createWriteStream(skangular.srcDirectory + angularAppName + "Config.js"));
+            .pipe(fs.createWriteStream(skangular.srcDirectory  + "config.js" + skangular.angularAppName + ".js"));
 
         skangular.endCreate();
     },
