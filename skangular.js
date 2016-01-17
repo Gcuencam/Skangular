@@ -3,10 +3,6 @@ var readline = require('readline');
 var colors = require('colors');
 var replaceStream = require('replacestream');
 
-var directorySrcCustom, publicDirectoryCustom;
-var directoryTemplate = "./templates/";
-var directorySrc, publicDirectory;
-
 colors.setTheme({
     info: 'green',
     data: 'grey',
@@ -20,97 +16,103 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
+var skangular = {
 
-rl.question("Angular app name: ".warn, function(answer) {
-    var angularAppName = answer;
-    configDirectories(angularAppName);
-});
+    templateDirectory: "./templates/",
+    srcDirectory: "",
+    srcDirectoryCustom: "",
+    publicDirectory: "",
+    publicDirectoryCustom: "",
+    angularAppName: "",
 
-var configDirectories = function(angularAppName){
-    rl.question("Introduza un directorio para los js, partiendo de raiz: ".warn, function(answer) {
-        directorySrcCustom = answer;
-    });
-    rl.question("Introduza un directorio para el index, partiendo de raiz: ".warn, function(answer) {
-        publicDirectoryCustom = answer;
-    });
+    lowerFirstLetter: function(string){
+        return string.charAt(0).toLowerCase() + string.slice(1);
+    },
 
-    directorySrc = "../../" + directorySrcCustom;
-    publicDirectory = "../../" + publicDirectoryCustom;
+    main: function() {
+        rl.question("Angular app name: ".warn, function(answer) {
+            skangular.angularAppName = answer;
+            skangular.configDirectories();
+        });
+    },
 
-    generateAppFile(angularAppName);
-    generateIndexFile(angularAppName);
-};
+    configDirectories: function(){
+        rl.question("Enter a directory for javascripts files, starting in root: ".warn, function(answer) {
+            skangular.srcDirectoryCustom = answer;
+            skangular.srcDirectory = "../../" + skangular.srcDirectoryCustom;
+            rl.question("Enter a directory for index file, starting in root: ".warn, function(answer) {
+                skangular.publicDirectoryCustom = answer;
+                skangular.publicDirectory = "../../" + skangular.publicDirectoryCustom;
+                skangular.generateAppFile();
+                skangular.generateIndexFile();
+            });
+        });
+    },
 
+    generateAppFile: function(){
+        var angularAppName = skangular.lowerFirstLetter(skangular.angularAppName);
+        fs.createReadStream(skangular.templateDirectory + "app")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.srcDirectory + "app" + angularAppName + ".js"));
+    },
 
-var generateAppFile = function(angularAppName){
-    angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream(directoryTemplate + "app")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(directorySrc + "app" + angularAppName + ".js"));
-};
+    generateIndexFile: function(){
+        var angularAppName = skangular.lowerFirstLetter(skangular.angularAppName);
+        fs.createReadStream(skangular.templateDirectory + "index")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.publicDirectory + "index.html"));
 
-var generateIndexFile = function(angularAppName){
-    angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream(directoryTemplate + "index")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(publicDirectory + "index.html"));
+        skangular.generateBasicFolder()
+    },
 
-    generateBasicFolder(angularAppName)
-};
+    generateBasicFolder: function(){
+        fs.mkdir(skangular.srcDirectory + 'controllers',function(err){
+            if (err)
+                return console.error(err.error);
+        });
+        fs.mkdir(skangular.srcDirectory + 'services',function(err){
+            if (err)
+                return console.error(err.error);
+        });
+        fs.mkdir(skangular.srcDirectory + 'factories',function(err){
+            if (err)
+                return console.error(err.error);
+        });
+        fs.mkdir(skangular.srcDirectory + 'providers',function(err){
+            if (err)
+                return console.error(err.error);
+        });
+        fs.mkdir(skangular.srcDirectory + 'public_views',function(err){
+            if (err)
+                return console.error(err.error);
+        });
+        fs.mkdir(skangular.srcDirectory + 'public_views/directives_templates',function(err){
+            if (err)
+                return console.error(err.error);
+        });
 
-var generateBasicFile = function (angularAppName){
-    angularAppName = lowerFirstLetter(angularAppName);
-    fs.createReadStream(directoryTemplate + "controller")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(directorySrc + "controllers/" + angularAppName + "Controller.js"));
-    fs.createReadStream(directoryTemplate + "service")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(directorySrc + "services/" + angularAppName + "Service.js"));
-    fs.createReadStream(directoryTemplate + "factory")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(directorySrc + "factories/" + angularAppName + "Factory.js"));
-    fs.createReadStream(directoryTemplate + "config")
-        .pipe(replaceStream('*****', angularAppName))
-        .pipe(fs.createWriteStream(directorySrc + angularAppName + "Config.js"));
+        skangular.generateBasicFile();
+    },
 
-    endCreate();
-};
+    generateBasicFile: function(){
+        var angularAppName = skangular.lowerFirstLetter(skangular.angularAppName);
+        fs.createReadStream(skangular.templateDirectory + "controller")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.srcDirectory + "controllers/" + angularAppName + "Controller.js"));
+        fs.createReadStream(skangular.templateDirectory + "service")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.srcDirectory + "services/" + angularAppName + "Service.js"));
+        fs.createReadStream(skangular.templateDirectory + "factory")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.srcDirectory + "factories/" + angularAppName + "Factory.js"));
+        fs.createReadStream(skangular.templateDirectory + "config")
+            .pipe(replaceStream('*****', angularAppName))
+            .pipe(fs.createWriteStream(skangular.srcDirectory + angularAppName + "Config.js"));
 
-var generateBasicFolder = function(angularAppName){
+        skangular.endCreate();
+    },
 
-
-    fs.mkdir(directorySrc + 'controllers',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir(directorySrc + 'services',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir(directorySrc + 'factories',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir(directorySrc + 'providers',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir(directorySrc + 'public_views',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-    fs.mkdir(directorySrc + 'public_views/directives_templates',function(err){
-        if (err)
-            return console.error(err.error);
-    });
-
-    generateBasicFile(angularAppName);
-};
-
-var lowerFirstLetter = function(string) {
-    return string.charAt(0).toLowerCase() + string.slice(1);
-};
-
-var endCreate = function(){
-    console.log("Project created !!".info)
+    endCreate: function(){
+        console.log("Project created !!".info)
+    }
 };

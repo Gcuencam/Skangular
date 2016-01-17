@@ -1,5 +1,5 @@
 {
-  "name": "Skangular",
+  "name": "skangular",
   "version": "1.0.0",
   "description": "Angular app generator.",
   "main": "skangular.js",
@@ -12,7 +12,7 @@
   },
   "author": "Gabriel Cuenca Moncin",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "colors": "1.1.2",
     "replacestream": "4.0.0"
   }
