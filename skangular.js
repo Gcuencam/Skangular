@@ -116,3 +116,5 @@ var skangular = {
         console.log("Project created !!".info)
     }
 };
+
+skangular.main();
